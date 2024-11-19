@@ -1,0 +1,14 @@
+# Node.js
+node_modules/
+
+# IDEs
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Environment variables
+.env
+
+# pnpm lock file
+pnpm-lock.yaml
