@@ -1,6 +1,5 @@
-const mongoose = require('mongoose');
 const Book = require('../models/book.model');
-const { json } = require('express');
+const fs = require('fs');
 
 const getBooks = async (req, res, next) => {
 	try {
@@ -75,6 +74,11 @@ const deleteBook = async (req, res, next) => {
 
 		if (book.userId.toString() !== req.auth.userId) {
 			return res.status(403).json({ message: 'Unauthorized' });
+		}
+
+		if (book.imageUrl) {
+			const filename = book.imageUrl.split('/images/')[1];
+			fs.unlink(`images/${filename}`, () => {});
 		}
 
 		await book.deleteOne();
