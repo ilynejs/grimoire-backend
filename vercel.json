@@ -11,8 +11,5 @@
       "src": "/(.*)",
       "dest": "/index.js"
     }
-  ],
-  "installCommand": "pnpm install",
-  "buildCommand": "echo 'No build step required'",
-  "outputDirectory": "/"
+  ]
 }
