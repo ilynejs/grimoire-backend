@@ -13,6 +13,6 @@
     }
   ],
   "installCommand": "pnpm install",
-  "buildCommand": "pnpm run build",
+  "buildCommand": "echo 'No build step required'",
   "outputDirectory": "/"
 }
