@@ -11,5 +11,8 @@
       "src": "/(.*)",
       "dest": "/index.js"
     }
-  ]
+  ],
+  "installCommand": "pnpm install --shamefully-hoist",
+  "buildCommand": "echo 'No build step required'",
+  "outputDirectory": "/"
 }
