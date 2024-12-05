@@ -1,5 +1,6 @@
 const Book = require('../models/book.model');
 const fs = require('fs');
+const sharp = require('sharp');
 
 const getBooks = async (req, res, next) => {
 	try {
@@ -44,12 +45,18 @@ const addBook = async (req, res, next) => {
 			}));
 		}
 
+		let imageUrl;
+		if (req.file) {
+			const webpPath = `images/${req.file.filename.split('.')[0]}.webp`;
+			await sharp(req.file.path).webp({ quality: 80 }).toFile(webpPath);
+			fs.unlinkSync(req.file.path);
+			imageUrl = `${req.protocol}://${req.get('host')}/${webpPath}`;
+		}
+
 		const book = new Book({
 			...bookObject,
 			userId: req.auth.userId,
-			imageUrl: req.file
-				? `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-				: undefined,
+			imageUrl,
 		});
 
 		await book.save();
@@ -70,23 +77,27 @@ const updateBook = async (req, res, next) => {
 			return res.status(403).json({ message: 'Unauthorized request' });
 		}
 
-		console.log(req.body, req.file, req.body.book);
 		const bookObject = req.body.book
 			? JSON.parse(req.body.book)
 			: { ...req.body };
 
-		if (req.file && book.imageUrl) {
-			const filename = book.imageUrl.split('/images/')[1];
-			fs.unlink(`images/${filename}`, (err) => {
-				if (err) console.error(err);
-			});
+		let imageUrl = book.imageUrl;
+		if (req.file) {
+			if (book.imageUrl) {
+				const filename = book.imageUrl.split('/images/')[1];
+				fs.unlink(`images/${filename}`, (err) => {
+					if (err) console.error(err);
+				});
+			}
+			const webpPath = `images/${req.file.filename.split('.')[0]}.webp`;
+			await sharp(req.file.path).webp({ quality: 80 }).toFile(webpPath);
+			fs.unlinkSync(req.file.path); // Supprimez l'image originale
+			imageUrl = `${req.protocol}://${req.get('host')}/${webpPath}`;
 		}
 
 		const updatedData = {
 			...bookObject,
-			imageUrl: req.file
-				? `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-				: book.imageUrl,
+			imageUrl,
 		};
 
 		const updatedBook = await Book.findOneAndUpdate(
